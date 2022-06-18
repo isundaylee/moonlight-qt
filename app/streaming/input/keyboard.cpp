@@ -155,6 +155,17 @@ void SdlInputHandler::handleKeyEvent(SDL_KeyboardEvent* event)
         return;
     }
 
+    // Add support for Parsec-like shortcuts
+    if ((event->state == SDL_PRESSED) &&
+            (event->keysym.mod & KMOD_GUI) &&
+            (event->keysym.mod & KMOD_ALT)) {
+        // Command + Option + ` -> Disconnect
+        if (event->keysym.sym == SDLK_BACKQUOTE) {
+            performSpecialKeyCombo(KeyComboQuit);
+            return;
+        }
+    }
+
     // Check for our special key combos
     if ((event->state == SDL_PRESSED) &&
             (event->keysym.mod & KMOD_CTRL) &&
