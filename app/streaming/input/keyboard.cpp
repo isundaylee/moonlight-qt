@@ -139,6 +139,10 @@ void SdlInputHandler::performSpecialKeyCombo(KeyCombo combo)
         updatePointerRegionLock();
         break;
 
+    case KeyComboToggleAudioMute:
+        Session::get()->toggleAudioMute();
+        break;
+
     default:
         Q_UNREACHABLE();
     }
@@ -155,13 +159,19 @@ void SdlInputHandler::handleKeyEvent(SDL_KeyboardEvent* event)
         return;
     }
 
-    // Add support for Parsec-like shortcuts
+    // Add support for my custom shortcuts
     if ((event->state == SDL_PRESSED) &&
             (event->keysym.mod & KMOD_GUI) &&
             (event->keysym.mod & KMOD_ALT)) {
         // Command + Option + ` -> Disconnect
         if (event->keysym.sym == SDLK_BACKQUOTE) {
             performSpecialKeyCombo(KeyComboQuit);
+            return;
+        }
+
+        // Command + Option + A -> Toggle audio mute
+        if (event->keysym.sym == SDLK_a) {
+            performSpecialKeyCombo(KeyComboToggleAudioMute);
             return;
         }
     }

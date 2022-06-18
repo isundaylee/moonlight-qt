@@ -44,6 +44,8 @@ public:
         return m_OverlayManager;
     }
 
+    void toggleAudioMute();
+
     void flushWindowEvents();
 
 signals:

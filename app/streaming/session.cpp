@@ -1510,6 +1510,11 @@ bool Session::startConnectionAsync()
     return true;
 }
 
+void Session::toggleAudioMute()
+{
+    m_AudioMuted = !m_AudioMuted;
+}
+
 void Session::flushWindowEvents()
 {
     // Pump events to ensure all pending OS events are posted
