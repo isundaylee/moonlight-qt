@@ -769,14 +769,16 @@ void FFmpegVideoDecoder::stringifyVideoStats(VIDEO_STATS& stats, char* output, i
 
         ret = snprintf(&output[offset],
                        length - offset,
-                       "Frames dropped by your network connection: %.2f%%\n"
-                       "Frames dropped due to network jitter: %.2f%%\n"
+                       "Frames dropped by your network connection: %.2f%% (%d frames)\n"
+                       "Frames dropped due to network jitter: %.2f%% (%d frames)\n"
                        "Average network latency: %s\n"
                        "Average decoding time: %.2f ms\n"
                        "Average frame queue delay: %.2f ms\n"
                        "Average rendering time (including monitor V-sync latency): %.2f ms\n",
                        (float)stats.networkDroppedFrames / stats.totalFrames * 100,
+                       stats.networkDroppedFrames,
                        (float)stats.pacerDroppedFrames / stats.decodedFrames * 100,
+                       stats.pacerDroppedFrames,
                        rttString,
                        (float)stats.totalDecodeTime / stats.decodedFrames,
                        (float)stats.totalPacerTime / stats.renderedFrames,
@@ -1598,9 +1600,15 @@ int FFmpegVideoDecoder::submitDecodeUnit(PDECODE_UNIT du)
         m_LastFrameNumber = du->frameNumber;
     }
     else {
+        int droppedFrames = du->frameNumber - (m_LastFrameNumber + 1);
+
+        if (droppedFrames > 0) {
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Dropped %d frames due to network.", droppedFrames);
+        }
+
         // Any frame number greater than m_LastFrameNumber + 1 represents a dropped frame
-        m_ActiveWndVideoStats.networkDroppedFrames += du->frameNumber - (m_LastFrameNumber + 1);
-        m_ActiveWndVideoStats.totalFrames += du->frameNumber - (m_LastFrameNumber + 1);
+        m_ActiveWndVideoStats.networkDroppedFrames += droppedFrames;
+        m_ActiveWndVideoStats.totalFrames += droppedFrames;
         m_LastFrameNumber = du->frameNumber;
     }
 
