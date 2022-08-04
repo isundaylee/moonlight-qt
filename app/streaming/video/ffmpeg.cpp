@@ -1612,6 +1612,48 @@ int FFmpegVideoDecoder::submitDecodeUnit(PDECODE_UNIT du)
         m_LastFrameNumber = du->frameNumber;
     }
 
+    static uint32_t lastTicks = 0;
+    static uint32_t minTicks = 0, maxTicks = 0;
+    static uint32_t count = 0, countGe20 = 0, countGe25 = 0, countGe30 = 0;
+
+    count++;
+    if (lastTicks == 0) {
+        lastTicks = SDL_GetTicks();
+    } else {
+        uint32_t currentTicks = SDL_GetTicks();
+        uint32_t elapsedTicks = currentTicks - lastTicks;
+        lastTicks = currentTicks;
+
+        if (minTicks == 0) {
+            minTicks = elapsedTicks;
+            maxTicks = elapsedTicks;
+        } else {
+            minTicks = elapsedTicks < minTicks ? elapsedTicks : minTicks;
+            maxTicks = elapsedTicks > maxTicks ? elapsedTicks : maxTicks;
+        }
+
+        if (elapsedTicks >= 20) {
+            countGe20 ++;
+        }
+
+        if (elapsedTicks >= 25) {
+            countGe25 ++;
+        }
+
+        if (elapsedTicks >= 30) {
+            countGe30 ++;
+        }
+
+        if (elapsedTicks >= 25) {
+            SDL_LogInfo(
+                SDL_LOG_CATEGORY_APPLICATION,
+                "Slow frame %5d elapsedTicks %2u",
+                du->frameNumber,
+                elapsedTicks
+            );
+        }
+    }
+
     // Flip stats windows roughly every second
     if (SDL_TICKS_PASSED(SDL_GetTicks(), m_ActiveWndVideoStats.measurementStartTimestamp + 1000)) {
         // Update overlay stats if it's enabled
@@ -1633,6 +1675,19 @@ int FFmpegVideoDecoder::submitDecodeUnit(PDECODE_UNIT du)
         SDL_memcpy(&m_LastWndVideoStats, &m_ActiveWndVideoStats, sizeof(m_ActiveWndVideoStats));
         SDL_zero(m_ActiveWndVideoStats);
         m_ActiveWndVideoStats.measurementStartTimestamp = SDL_GetTicks();
+
+        SDL_LogInfo(
+            SDL_LOG_CATEGORY_APPLICATION,
+            "Frame minTicks %2u maxTicks %2u count %2u slow20/25/30 = %2u / %2u / %2u",
+            minTicks,
+            maxTicks,
+            count,
+            countGe20,
+            countGe25,
+            countGe30
+        );
+        minTicks = maxTicks = 0;
+        count = countGe20 = countGe25 = countGe30 = 0;
     }
 
     if (du->frameHostProcessingLatency != 0) {
