@@ -143,7 +143,7 @@ void sdlLogToDiskHandler(void*, int category, SDL_LogPriority priority, const ch
     }
 
     QTime logTime = QTime::fromMSecsSinceStartOfDay(s_LoggerTime.elapsed());
-    QString txt = QString("%1 - SDL %2 (%3): %4\n").arg(logTime.toString()).arg(priorityTxt).arg(category).arg(message);
+    QString txt = QString("%1 - %2 - SDL %3 (%4): %5\n").arg(logTime.toString()).arg(QDateTime::currentDateTime().toString("yyyy/MM/dd-hh:mm:ss,zzz")).arg(priorityTxt).arg(category).arg(message);
 
     logToLoggerStream(txt);
 }
