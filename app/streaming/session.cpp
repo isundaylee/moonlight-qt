@@ -1192,8 +1192,8 @@ void Session::getWindowDimensions(int& x, int& y,
         src.x = src.y = dst.x = dst.y = 0;
         src.w = m_StreamConfig.width;
         src.h = m_StreamConfig.height;
-        dst.w = ((int)SDL_ceilf(usableBounds.w * 0.80f) & ~0x1);
-        dst.h = ((int)SDL_ceilf(usableBounds.h * 0.80f) & ~0x1);
+        dst.w = ((int)SDL_ceilf(usableBounds.w * 1.00f) & ~0x1);
+        dst.h = ((int)SDL_ceilf(usableBounds.h * 1.00f) & ~0x1);
 
         // Scale the window size while preserving aspect ratio
         StreamUtils::scaleSourceToDestinationSurface(&src, &dst);
