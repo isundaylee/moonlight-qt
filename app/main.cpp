@@ -64,8 +64,8 @@ static bool s_SuppressVerboseOutput;
 static QRegularExpression k_RikeyRegex("&rikey=\\w+");
 static QRegularExpression k_RikeyIdRegex("&rikeyid=[\\d-]+");
 #ifdef LOG_TO_FILE
-// Max log file size of 10 MB
-#define MAX_LOG_SIZE_BYTES (10 * 1024 * 1024)
+// Max log file size of 300 MB
+#define MAX_LOG_SIZE_BYTES (300 * 1024 * 1024)
 static int s_LogBytesWritten = 0;
 static bool s_LogLimitReached = false;
 static QFile* s_LoggerFile;
